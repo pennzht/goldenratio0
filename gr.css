@@ -1,11 +1,16 @@
 svg {
-    width: 800px;
-    height: 600px;
+    width: 320px;
+    height: 240px;
 }
 
 .draggable {
     cursor: move;
     user-select: none;
+    color: #0069dd;
+}
+
+body {
+    font-family: Inter, sans-serif;
 }
 
 /* body {
