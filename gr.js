@@ -13,6 +13,20 @@ val = 0;
 isarr = Array.isArray;
 isstr = (x) => (typeof x === 'string');
 
+function cross (a, b) {
+    const [x1, y1, z1] = a;
+    const [x2, y2, z2] = b;
+    return [y1*z2-z1*y2, z1*x2-x1*z2, x1*y2-y1*x2];
+}
+
+function intersect (seg1, seg2) {
+    const [_a, x1, y1, x2, y2] = seg1;
+    const [_b, x3, y3, x4, y4] = seg2;
+    const r = cross (cross ([x1, y1, 1], [x2, y2, 1]),
+                     cross ([x3, y3, 1], [x4, y4, 1]));
+    return [r[0]/r[2], r[1]/r[2]];
+}
+
 function evaluate (def, values) {
     if (isarr (def)) {
         if (def[0] === 'var') {
@@ -33,6 +47,8 @@ function evaluate (def, values) {
             });
         } else if (def[0] == 'segment') {
             return ['segment'].concat( evaluate (def[1], values)) .concat( evaluate (def[2], values));
+        } else if (def[0] == 'intersect') {
+            return intersect (evaluate (def[1], values), evaluate (def[2], values));
         } else {
             return NaN;
         }
@@ -125,9 +141,13 @@ Home = new Graph (
               ['A', ['var', 'A']],
               ['B', ['var', 'B']],
               ['C', ['var', 'C']],
+              ['D', ['var', 'D']],
               ['L', ['segment', 'A', 'B']],
               ['M', ['segment', 'B', 'C']],
               ['N', ['segment', 'C', 'A']],
+              ['O', ['segment', 'A', 'D']],
+              ['X', ['intersect', 'M', 'O']],
+              ['Y', ['segment', 'X', ['list', 60, 20]]],
              ]),
     // upstrs
     new Map ([['a', []],
@@ -152,12 +172,16 @@ Home = new Graph (
               ['d', []],
               ['p', []],
               ['q', []],
-              ['A', ['L', 'N']],
+              ['A', ['L', 'N', 'O']],
               ['B', ['L', 'M']],
               ['C', ['M', 'N']],
+              ['D', ['O']],
               ['L', []],
-              ['M', []],
+              ['M', ['X']],
               ['N', []],
+              ['O', ['X']],
+              ['X', ['Y']],
+              ['Y', []],
              ]),
     // levels
     new Map ([['a', 0],
@@ -169,9 +193,14 @@ Home = new Graph (
               ['q', 2],
               ['A', 1],
               ['B', 3],
+              ['C', 3],
+              ['D', 4],
               ['L', 4],
               ['M', 4],
               ['N', 4],
+              ['O', 4],
+              ['X', 5],
+              ['Y', 6],
              ]),
     // values
     new Map ([['a', 0],
@@ -184,9 +213,13 @@ Home = new Graph (
               ['A', [30, 50]],
               ['B', [50, 50]],
               ['C', [40, 40]],
+              ['D', [60, 40]],
               ['L', ['segment', 30, 50, 50, 50]],
               ['M', null],
               ['N', null],
+              ['O', null],
+              ['X', null],
+              ['Y', null],
              ]),
 )
 
